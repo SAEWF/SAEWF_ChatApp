@@ -868,23 +868,27 @@ const MessagesView = ({
       emitStopTyping();
       hideEmojiPicker();
       const prevMsg = messages.filter(msg => msg._id === clickedMsgId)[0];
-      console.log('prev', prevMsg);
-      console.log('all users', forwardUsers);
       if (!prevMsg) return;
     
       setDontScrollToBottom(false);
       resetMsgInput();
       setSending(true);
+      dispatch(setLoading(true));
 
       let data = forwardUsers.map(async (usr) => {
         return await forwardMessage(prevMsg, usr);
-      })  
+      })
       data = await Promise.all(data);
       console.log(data);
-    
-      if (isSocketConnected) clientSocket?.emit("new msg sent", data);
+      
+      displaySuccess("Message Forwarded Successfully");
+      if (isSocketConnected)
+        data.forEach(d => clientSocket?.emit("new msg sent", d));
       fetchMessages();
       dispatch(toggleRefresh(!refresh));
+      dispatch(setLoading(false));
+      setSending(false);
+      return "msgActionDone";
     } catch (error) {
       displayError(error, "Couldn't Send Message");
       setSending(false);
@@ -899,6 +903,7 @@ const MessagesView = ({
         title: "Forward Message",
         nolabel: "Cancel",
         yeslabel: "Forward",
+        loadingYeslabel: "Forwarding...",
         action: handleForward,
       })
     );
