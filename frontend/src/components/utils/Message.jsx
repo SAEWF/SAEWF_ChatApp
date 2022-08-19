@@ -32,6 +32,8 @@ const Message = forwardRef(
       loadingMediaId,
       msgEditMode,
       clickedMsgId,
+      msg_id,
+      onMsgClick,
       msgFileRemoved,
       CustomTooltip,
       msgSent,
@@ -58,7 +60,6 @@ const Message = forwardRef(
       selectedChat?.isGroupChat &&
       (!isSameSender || isOtherDay);
     const isEditMode = msgEditMode && isClickedMsgCurrMsg;
-
     const fileEditIcons = (
       <>
         <CustomTooltip title="Remove Attachment" placement="top" arrow>
@@ -183,11 +184,12 @@ const Message = forwardRef(
               </span>
             )}
             {/* {isLoggedInUser &&  ( */}
-              <span
-                data-msg={currMsgId}
-                data-file-exists={file_id}
-                title="Edit/Delete Message"
-                className={`msgOptionsIcon text-light position-absolute 
+            <span
+              onClick={(e) => { onMsgClick(e,msg_id) }}
+              data-msg={currMsgId}
+              data-file-exists={file_id}
+              title="Edit/Delete Message"
+              className={`msgOptionsIcon text-light position-absolute 
               top-0 end-0 w-25 h-100`}
               >
                 <KeyboardArrowDown

@@ -704,68 +704,66 @@ const MessagesView = ({
   };
 
   // Msgs click handler ('Event Delegation' applied here)
-  const msgsClickHandler = (e) => {
-    const { dataset } = e.target;
-    const parentDataset = e.target.parentNode.dataset;
-    const senderData = (dataset.sender || parentDataset.sender)?.split("===");
-    const msgId = dataset.msg || parentDataset.msg;
-    const videoId = dataset.video || parentDataset.video;
-    const audioId = dataset.audio || parentDataset.audio;
-    const fileId = dataset.download || parentDataset.download;
-    const updateEditedMsg = dataset.updateMsg || parentDataset.updateMsg;
-    const attachMsgFileClicked =
-      dataset.attachMsgFile || parentDataset.attachMsgFile;
-    const removeMsgFileClicked =
-      dataset.removeMsgFile || parentDataset.removeMsgFile;
-    const editMsgFileClicked = dataset.editMsgFile || parentDataset.editMsgFile;
-    const discardDraftClicked =
-      dataset.discardDraft || parentDataset.discardDraft;
-    hideEmojiPicker();
-    console.log('dataset', dataset);
-    console.log('parent dataset', parentDataset);
-    console.log(msgId, msgEditMode);
-      if (fileId) {
-        downloadFile(fileId);
-      } else if (videoId) {
-        // Load video
-        loadMedia(videoId, {
-          fileName: dataset.videoName || parentDataset.videoName,
-          isAudio: false,
-        });
-      } else if (audioId) {
-        // Load audio
-        loadMedia(audioId, {
-          fileName: dataset.audioName || parentDataset.audioName,
-          isAudio: true,
-        });
-      } else if (dataset.imageId) {
-        displayFullSizeImage(e);
-      } else if (senderData?.length) {
-        // Open view profile dialog
-      const props = {
-        memberProfilePic: senderData[0],
-        memberName: senderData[1],
-        memberEmail: senderData[2],
-      };
-      openViewProfileDialog(props);
-      } else if (msgId && !msgEditMode) {
-      msgFileAlreadyExists = Boolean(
-        dataset.fileExists || parentDataset.fileExists
-      );
-      setClickedMsgId(msgId);
-      openMsgOptionsMenu(e);
-    } else if (attachMsgFileClicked || editMsgFileClicked) {
-      selectAttachment();
-    } else if (removeMsgFileClicked) {
-      setMsgFileRemoved(true);
-      discardAttachment();
-    } else if (discardDraftClicked) {
-      openDiscardDraftConfirmDialog();
-    } else if (updateEditedMsg) {
-      const msgDate = dataset.msgCreatedAt || parentDataset.msgCreatedAt;
-      updateMessage(editableMsgContent?.current?.innerHTML, msgDate);
-    }
-  };
+  // const msgsClickHandler = (e) => {
+  //   console.log("messageClicked", clickedMsgId);
+  //   const { dataset } = e.target;
+  //   const parentDataset = e.target.parentNode.dataset;
+  //   const senderData = (dataset.sender || parentDataset.sender)?.split("===");
+  //   const msgId = dataset.msg || parentDataset.msg;
+  //   const videoId = dataset.video || parentDataset.video;
+  //   const audioId = dataset.audio || parentDataset.audio;
+  //   const fileId = dataset.download || parentDataset.download;
+  //   const updateEditedMsg = dataset.updateMsg || parentDataset.updateMsg;
+  //   const attachMsgFileClicked =
+  //     dataset.attachMsgFile || parentDataset.attachMsgFile;
+  //   const removeMsgFileClicked =
+  //     dataset.removeMsgFile || parentDataset.removeMsgFile;
+  //   const editMsgFileClicked = dataset.editMsgFile || parentDataset.editMsgFile;
+  //   const discardDraftClicked =
+  //     dataset.discardDraft || parentDataset.discardDraft;
+  //   hideEmojiPicker();
+  //     if (fileId) {
+  //       downloadFile(fileId);
+  //     } else if (videoId) {
+  //       // Load video
+  //       loadMedia(videoId, {
+  //         fileName: dataset.videoName || parentDataset.videoName,
+  //         isAudio: false,
+  //       });
+  //     } else if (audioId) {
+  //       // Load audio
+  //       loadMedia(audioId, {
+  //         fileName: dataset.audioName || parentDataset.audioName,
+  //         isAudio: true,
+  //       });
+  //     } else if (dataset.imageId) {
+  //       displayFullSizeImage(e);
+  //     } else if (senderData?.length) {
+  //       // Open view profile dialog
+  //     const props = {
+  //       memberProfilePic: senderData[0],
+  //       memberName: senderData[1],
+  //       memberEmail: senderData[2],
+  //     };
+  //     openViewProfileDialog(props);
+  //     } else if (msgId && !msgEditMode) {
+  //     msgFileAlreadyExists = Boolean(
+  //       dataset.fileExists || parentDataset.fileExists
+  //     );
+  //     setClickedMsgId(msgId);
+  //     openMsgOptionsMenu(e);
+  //   } else if (attachMsgFileClicked || editMsgFileClicked) {
+  //     selectAttachment();
+  //   } else if (removeMsgFileClicked) {
+  //     setMsgFileRemoved(true);
+  //     discardAttachment();
+  //   } else if (discardDraftClicked) {
+  //     openDiscardDraftConfirmDialog();
+  //   } else if (updateEditedMsg) {
+  //     const msgDate = dataset.msgCreatedAt || parentDataset.msgCreatedAt;
+  //     updateMessage(editableMsgContent?.current?.innerHTML, msgDate);
+  //   }
+  // };
 
   useEffect(() => {
     if (!dontScrollToBottom) scrollToBottom();
@@ -806,6 +804,13 @@ const MessagesView = ({
       })
     );
   };
+
+  const onMsgClick = async (e,msg_id) => {
+    console.log(msg_id);
+    console.log(messages.filter(message => message._id === msg_id)[0]);
+    setClickedMsgId(msg_id);
+    openMsgOptionsMenu(e);
+  }
 
   const forwardMessage = async (prevMsg, usr) => {
   
@@ -940,7 +945,7 @@ const MessagesView = ({
             <div className="messages rounded-3 d-flex flex-column">
               <div
                 // Event delegation
-                onClick={msgsClickHandler}
+                // onClick={msgsClickHandler}
                 onKeyDown={msgKeydownHandler}
                 className={`msgArea overflow-auto ${
                   fileAttached && !msgEditMode ? "d-none" : "d-flex"
@@ -957,6 +962,8 @@ const MessagesView = ({
                           loadingMediaId={loadingMediaId}
                           msgEditMode={msgEditMode}
                           clickedMsgId={clickedMsgId}
+                          msg_id={m._id}
+                          onMsgClick={onMsgClick}
                           msgFileRemoved={msgFileRemoved}
                           attachmentData={attachmentData}
                           ref={editableMsgContent}
@@ -964,7 +971,7 @@ const MessagesView = ({
                           key={m._id}
                           msgSent={m.sent}
                           currMsg={m}
-                          // prevMsg={i < msgs.length - 1 ? msgs[i + 1] : null}
+                          prevMsg={i < msgs.length - 1 ? msgs[i + 1] : null}
                         />
                       )
                     })
