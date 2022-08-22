@@ -1,4 +1,5 @@
 import asyncHandler from "express-async-handler";
+import fetch from 'node-fetch';
 import MessageModel from "../models/MessageModel.js";
 import ChatModel from "../models/ChatModel.js";
 import { deleteFile, deleteExistingAttachment } from "../utils/deleteFile.js";
@@ -27,6 +28,7 @@ const fetchMessages = asyncHandler(async (req, res) => {
 const sendMessage = asyncHandler(async (req, res) => {
   const attachment = req.file;
   const { mediaDuration, content, chatId } = req.body;
+  console.log(req.body);
   const loggedInUser = req.user?._id;
 
   console.log(attachment, content, chatId);

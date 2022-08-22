@@ -239,29 +239,29 @@ const MessagesView = ({
     }
   };
 
-  const downloadFile = async (fileId) => {
-    if (!fileId) return;
-    setDownloadingFileId(fileId);
-    setSending(true);
-    const config = getAxiosConfig({ loggedInUser, blob: true });
-    try {
-      const { data } = await axios.get(`/api/message/files/${fileId}`, config);
+  // const downloadFile = async (fileId) => {
+  //   if (!fileId) return;
+  //   setDownloadingFileId(fileId);
+  //   setSending(true);
+  //   const config = getAxiosConfig({ loggedInUser, blob: true });
+  //   try {
+  //     const { data } = await axios.get(`/api/message/files/${fileId}`, config);
 
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(new Blob([data]));
-      link.setAttribute("download", fileId.split("---")[1] || fileId);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(new Blob([data]));
+  //     link.setAttribute("download", fileId.split("---")[1] || fileId);
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
 
-      setDownloadingFileId("");
-      setSending(false);
-    } catch (error) {
-      displayError(error, "Couldn't Download File");
-      setDownloadingFileId("");
-      setSending(false);
-    }
-  };
+  //     setDownloadingFileId("");
+  //     setSending(false);
+  //   } catch (error) {
+  //     displayError(error, "Couldn't Download File");
+  //     setDownloadingFileId("");
+  //     setSending(false);
+  //   }
+  // };
 
   const fetchMessages = async (options) => {
     setLoadingMsgs(true);
@@ -295,6 +295,7 @@ const MessagesView = ({
     hideEmojiPicker();
     if (!attachmentData.attachment && !msgContent.current?.innerHTML) return;
 
+    
     const msgData = {
       ...attachmentData,
       content: msgContent.current?.innerHTML || "",
@@ -331,13 +332,19 @@ const MessagesView = ({
     resetMsgInput();
     setSending(true);
     const config = getAxiosConfig({ loggedInUser, formData: true });
-
+    
+    
     try {
       // Upload img/gif to cloudinary, and all other files to aws s3
       // const apiUrl = isNonImageFile
       //   ? `/api/message/upload-to-s3`
       //   : `/api/message/`;
-
+      let chats = await axios.get('/api/chat', config);
+      chats = chats.data;
+      console.log(chats);
+      let users = chats.filter((c) => c._id === selectedChat?._id)[0]?.users;
+      let receiver = users.filter((u) => u._id !== loggedInUser?._id)[0];
+      console.log(receiver);
       const apiUrl = `/api/message/`;
 
       const formData = new FormData();
@@ -345,8 +352,11 @@ const MessagesView = ({
       formData.append("mediaDuration", msgData?.mediaDuration);
       formData.append("content", msgData.content);
       formData.append("chatId", selectedChat?._id);
-      console.log('selected Chat', selectedChat);
-      console.log(formData.get('content'));
+      formData.append("sender", loggedInUser?.email);
+      formData.append("receiver", receiver?.email);
+      formData.append("time", new Date().getTime());
+      // console.log(formData.get('content'));
+      // console.log('selected Chat', selectedChat);
       // console.log(formData);
       const { data } = await axios.post(apiUrl, formData, config);
 
@@ -848,10 +858,12 @@ const MessagesView = ({
       formData.append("mediaDuration", msgData?.mediaDuration);
       formData.append("content", msgData.content);
       formData.append("chatId", chatId);
-      formData.append("prevSender", prevMsg?.sender?._id);
-      formData.append("time", new Date().toISOString());
-      formData.append("prevTime", prevMsg?.createdAt);
-      formData.append("forward", true);
+      formData.append("receiver", usr?.email);
+      formData.append("sender", loggedInUser?.email);
+      formData.append("prev_sender", prevMsg?.sender?.email);
+      formData.append("time", new Date().getTime());
+      formData.append("prev_time", prevMsg?.createdAt);
+      formData.append("forwarded", true);
 
       const { data } = await axios.post(apiUrl, formData, config);
       console.log(data);

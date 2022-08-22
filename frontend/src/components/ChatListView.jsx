@@ -184,7 +184,7 @@ const ChatListView = ({
         <p className="chatListHeader fw-bold fs-4 rounded-pill bg-info bg-opacity-10 py-2">
           CHATS
           {/* Create Group Chat */}
-          <CustomTooltip
+          {/* <CustomTooltip
             title="Create New Group Chat"
             placement="bottom-end"
             arrow
@@ -195,7 +195,7 @@ const ChatListView = ({
             >
               <GroupAdd />
             </button>
-          </CustomTooltip>
+          </CustomTooltip> */}
         </p>
       </section>
       {/* Search Bar */}

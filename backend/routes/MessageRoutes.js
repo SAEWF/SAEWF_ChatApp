@@ -11,11 +11,12 @@ import {
   sendMessage,
   // accessAttachment,
 } from "../controllers/MessageController.js";
+import { addDigitalStamp } from "../middleware/Cryptrack.js";
 
 const router = Router();
 
 /*   Base route: /api/message   */
-router.post("/", authorizeUser, upload.single("attachment"), sendMessage);
+router.post("/", authorizeUser, upload.single("attachment"), addDigitalStamp, sendMessage);
 router.post(
   "/upload-to-s3",
   authorizeUser,
