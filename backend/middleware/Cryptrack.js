@@ -3,7 +3,7 @@ import { APIKey, APISecret, username } from '../config/Cryptrack.js';
 export const addDigitalStamp = async (req, res, next) => {
     try {
         const url = 'http://localhost:8080/send';
-        let jsonBody = {...req.body, msg: req.body.content, content: ''};
+        let jsonBody = { ...req.body, msg: req.body.content, content: '' };
         const res = fetch(url, {
             method: 'POST',
             headers: {

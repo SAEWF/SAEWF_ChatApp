@@ -852,7 +852,6 @@ const MessagesView = ({
       //   : `/api/message/`;
 
       const apiUrl = `/api/message/`;
-
       const formData = new FormData();
       formData.append("attachment", msgData.attachment);
       formData.append("mediaDuration", msgData?.mediaDuration);
@@ -862,7 +861,7 @@ const MessagesView = ({
       formData.append("sender", loggedInUser?.email);
       formData.append("prev_sender", prevMsg?.sender?.email);
       formData.append("time", new Date().getTime());
-      formData.append("prev_time", prevMsg?.createdAt);
+      formData.append("prev_time", prevMsg?.time);
       formData.append("forwarded", true);
 
       const { data } = await axios.post(apiUrl, formData, config);

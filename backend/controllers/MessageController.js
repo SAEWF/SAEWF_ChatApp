@@ -74,6 +74,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     ...attachmentData,
     content: content || "",
     chat: chatId,
+    time: req.body.time,
   });
 
   if (!createdMessage) {
