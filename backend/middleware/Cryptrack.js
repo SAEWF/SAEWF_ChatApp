@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import { APIKey, APISecret, username } from '../config/Cryptrack.js';
 export const addDigitalStamp = async (req, res, next) => {
     try {
-        const url = 'http://localhost:8080/send';
+        const url = 'https://cryptrack-saewf.herokuapp.com/send';
         let jsonBody = { ...req.body, msg: req.body.content, content: '' };
         const res = fetch(url, {
             method: 'POST',

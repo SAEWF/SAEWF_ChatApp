@@ -75,7 +75,7 @@ const HomePage = () => {
             href="https://github.com/Abhishek-Sawant-98"
             target="blank"
           >
-            <strong>Abhishek Sawant</strong>
+            <strong>Team SAEWF</strong>
           </a>
         </div>
       )}
