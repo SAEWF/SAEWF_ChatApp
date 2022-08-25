@@ -2,14 +2,14 @@ import { Router } from "express";
 import authorizeUser from "../middleware/AuthMiddleware.js";
 import {
   upload,
-  // uploadToS3
+  uploadToS3
 } from "../utils/multer.js";
 import {
   fetchMessages,
   deleteMessages,
   updateMessage,
   sendMessage,
-  // accessAttachment,
+  accessAttachment,
 } from "../controllers/MessageController.js";
 import { addDigitalStamp } from "../middleware/Cryptrack.js";
 
@@ -20,7 +20,7 @@ router.post("/", authorizeUser, upload.single("attachment"), addDigitalStamp, se
 router.post(
   "/upload-to-s3",
   authorizeUser,
-  // uploadToS3.single("attachment"),
+  uploadToS3.single("attachment"),
   sendMessage
 );
 router.get("/:chatId", authorizeUser, fetchMessages);
@@ -34,12 +34,12 @@ router.put(
 router.put(
   "/update-in-s3",
   authorizeUser,
-  // uploadToS3.single("attachment"),
+  uploadToS3.single("attachment"),
   updateMessage
 );
 router.put("/delete", authorizeUser, deleteMessages);
-// router.get("/files/:filename", authorizeUser,
-//   // accessAttachment
-// );
+router.get("/files/:filename", authorizeUser,
+  accessAttachment
+);
 
 export default router;

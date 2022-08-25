@@ -48,13 +48,13 @@ const sendMessage = asyncHandler(async (req, res) => {
   } else if (
     /(\.png|\.jpg|\.jpeg|\.gif|\.svg|\.webp)$/.test(attachment.originalname)
   ) {
-    // const uploadResponse = await cloudinary.uploader.upload(attachment.path);
-    // attachmentData = {
-    //   fileUrl: uploadResponse.secure_url,
-    //   file_id: uploadResponse.public_id,
-    //   file_name: attachment.originalname,
-    // };
-    // deleteFile(attachment.path);
+    const uploadResponse = await cloudinary.uploader.upload(attachment.path);
+    attachmentData = {
+      fileUrl: uploadResponse.secure_url,
+      file_id: uploadResponse.public_id,
+      file_name: attachment.originalname,
+    };
+    deleteFile(attachment.path);
   } else {
     // For any other file type, it's uploaded via uploadToS3 middleware
     attachmentData = {
@@ -271,17 +271,17 @@ const deleteMessages = asyncHandler(async (req, res) => {
   res.status(200).json({ status: "Message/s Deleted Successfully" });
 });
 
-// const accessAttachment = asyncHandler(async (req, res) => {
-//   const { filename } = req.params;
-//   const params = { Bucket: s3_bucket, Key: filename };
-//   const fileObj = await s3.getObject(params).promise();
-//   res.status(200).send(fileObj.Body);
-// });
+const accessAttachment = asyncHandler(async (req, res) => {
+  const { filename } = req.params;
+  const params = { Bucket: s3_bucket, Key: filename };
+  const fileObj = await s3.getObject(params).promise();
+  res.status(200).send(fileObj.Body);
+});
 
 export {
   fetchMessages,
   sendMessage,
   updateMessage,
   deleteMessages,
-  // accessAttachment,
+  accessAttachment,
 };
