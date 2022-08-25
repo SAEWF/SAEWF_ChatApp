@@ -822,8 +822,8 @@ const MessagesView = ({
     openMsgOptionsMenu(e);
   }
 
-  const forwardMessage = async (prevMsg, usr) => {
-  
+  const forwardMessage = async (prevMsg, usr, attachedFile) => {
+    console.log('attachedFile', attachedFile);
     let config = getAxiosConfig({ loggedInUser });
     console.log(usr);
     const { data } = await axios.post(
@@ -837,7 +837,7 @@ const MessagesView = ({
     console.log("chat", chat);
     
     const msgData = {
-      ...attachmentData,
+      attachment: attachedFile,
       content: prevMsg?.content || "",
     };
 
@@ -851,7 +851,7 @@ const MessagesView = ({
       const apiUrl = isNonImageFile
         ? `/api/message/upload-to-s3`
         : `/api/message/`;
-
+      console.log(apiUrl);
       // const apiUrl = `/api/message/`;
       const formData = new FormData();
       formData.append("attachment", msgData.attachment);
@@ -864,15 +864,23 @@ const MessagesView = ({
       formData.append("time", new Date().getTime());
       formData.append("prev_time", prevMsg?.time);
       formData.append("forwarded", true);
-
+      console.log(formData['attachment']);
       const { data } = await axios.post(apiUrl, formData, config);
-      console.log(data);
+      console.log('res',data);
       return data;
     } catch (error) {
       displayError(error, "Couldn't Send Message");
       setSending(false);
     }
   }
+
+  const getBase64 = (blob) => {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  };
 
   const handleForward = async () => {
     try {
@@ -886,10 +894,21 @@ const MessagesView = ({
       resetMsgInput();
       setSending(true);
       dispatch(setLoading(true));
+      
+      let attachedFile;
+      if (prevMsg.fileUrl) {
+        let fileurl = prevMsg.fileUrl;
+        attachedFile = await fetch(fileurl).then(d=>d.blob());
+      }
+      // console.log('attachedFile', attachedFile);
+      console.log('prev', prevMsg);
 
       let data = forwardUsers.map(async (usr) => {
-        return await forwardMessage(prevMsg, usr);
-      })
+        const img = await getBase64(attachedFile)
+        return await forwardMessage(prevMsg, usr, img);
+        // return res;
+        // });
+      });
       data = await Promise.all(data);
       console.log(data);
       

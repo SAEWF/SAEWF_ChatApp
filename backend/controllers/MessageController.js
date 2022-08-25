@@ -32,9 +32,11 @@ const sendMessage = asyncHandler(async (req, res) => {
   const loggedInUser = req.user?._id;
 
   console.log(attachment, content, chatId);
+  console.log(req.body);
 
   if ((!content && !attachment) || !chatId) {
     res.status(400);
+    console.log('error returning');
     throw new Error("Invalid request params for sending a message");
   }
 
