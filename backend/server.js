@@ -17,7 +17,7 @@ connectToMongoDB();
 
 const app = express();
 const DIRNAME = path.resolve();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 // Config middlewares
 app.use(cors());

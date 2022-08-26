@@ -4,6 +4,7 @@ import MessageModel from "../models/MessageModel.js";
 import ChatModel from "../models/ChatModel.js";
 import { deleteFile, deleteExistingAttachment } from "../utils/deleteFile.js";
 import cloudinary from "../config/cloudinary.js";
+import { addDigitalStamp } from "../middleware/Cryptrack.js";
 // import { s3, s3_bucket } from "../config/aws_S3.js";
 
 const fetchMessages = asyncHandler(async (req, res) => {
@@ -27,47 +28,55 @@ const fetchMessages = asyncHandler(async (req, res) => {
 
 const sendMessage = asyncHandler(async (req, res) => {
   const attachment = req.file;
-  const { mediaDuration, content, chatId } = req.body;
-  console.log(req.body);
+  const { mediaDuration, content, chatId, isFile } = req.body;
+  // console.log(req.body);
   const loggedInUser = req.user?._id;
 
   console.log(attachment, content, chatId);
+  // console.log(req.body);
 
-  if ((!content && !attachment) || !chatId) {
+  if ((!content && !isFile && !attachment) || !chatId) {
     res.status(400);
     throw new Error("Invalid request params for sending a message");
   }
 
-  let attachmentData;
-  if (!attachment) {
-    attachmentData = {
-      fileUrl: null,
-      file_id: null,
-      file_name: null,
-    };
-  } else if (
-    /(\.png|\.jpg|\.jpeg|\.gif|\.svg|\.webp)$/.test(attachment.originalname)
-  ) {
-    // const uploadResponse = await cloudinary.uploader.upload(attachment.path);
-    // attachmentData = {
-    //   fileUrl: uploadResponse.secure_url,
-    //   file_id: uploadResponse.public_id,
-    //   file_name: attachment.originalname,
-    // };
-    // deleteFile(attachment.path);
-  } else {
-    // For any other file type, it's uploaded via uploadToS3 middleware
-    attachmentData = {
-      fileUrl: attachment.location || "",
-      file_id: attachment.key || "",
-      file_name:
-        attachment.originalname +
-        "===" +
-        (mediaDuration !== "undefined"
-          ? `${mediaDuration}+++${attachment.size}`
-          : attachment.size),
-    };
+  let attachmentData = req.body.attachmentData;
+  if (attachmentData)
+    attachmentData = JSON.parse(attachmentData);
+  console.log('attachmentData', attachmentData);
+  if (!attachmentData) {
+    if (!attachment) {
+      attachmentData = {
+        fileUrl: null,
+        file_id: null,
+        file_name: null,
+      };
+    } else if (
+      /(\.png|\.jpg|\.jpeg|\.gif|\.svg|\.webp)$/.test(attachment.originalname)
+    ) {
+      const uploadResponse = await cloudinary.uploader.upload(attachment.path);
+      attachmentData = {
+        fileUrl: uploadResponse.secure_url,
+        file_id: uploadResponse.public_id,
+        file_name: attachment.originalname,
+      };
+      deleteFile(attachment.path);
+    } else {
+      // For any other file type, it's uploaded via uploadToS3 middleware
+      attachmentData = {
+        fileUrl: attachment.location || "",
+        file_id: attachment.key || "",
+        file_name:
+          attachment.originalname +
+          "===" +
+          (mediaDuration !== "undefined"
+            ? `${mediaDuration}+++${attachment.size}`
+            : attachment.size),
+      };
+    }
   }
+  req.body.attachmentData = attachmentData;
+  addDigitalStamp(req, res);
 
   const createdMessage = await MessageModel.create({
     sender: loggedInUser,
@@ -271,17 +280,17 @@ const deleteMessages = asyncHandler(async (req, res) => {
   res.status(200).json({ status: "Message/s Deleted Successfully" });
 });
 
-// const accessAttachment = asyncHandler(async (req, res) => {
-//   const { filename } = req.params;
-//   const params = { Bucket: s3_bucket, Key: filename };
-//   const fileObj = await s3.getObject(params).promise();
-//   res.status(200).send(fileObj.Body);
-// });
+const accessAttachment = asyncHandler(async (req, res) => {
+  const { filename } = req.params;
+  const params = { Bucket: s3_bucket, Key: filename };
+  const fileObj = await s3.getObject(params).promise();
+  res.status(200).send(fileObj.Body);
+});
 
 export {
   fetchMessages,
   sendMessage,
   updateMessage,
   deleteMessages,
-  // accessAttachment,
+  accessAttachment,
 };

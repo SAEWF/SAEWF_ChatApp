@@ -1,3 +1,3 @@
-export const APIKey = "qoaUC8Qhs.1Y.bP3sTmpYGnt";
-export const APISecret = "KfhD+ha/z77rX9fYFbwh1V1+E+XrBvs-eP-N";
-export const username = "gurjarraghav2001@gmail.com";
+export const APIKey = "L.W6w9.XpGOYb1iKGfhmW3q0";
+export const APISecret = "QrwygxP8_32GTSjuXayl_TrAJOuYiGvBYLzb";
+export const username = "saewf@nitw.com";
