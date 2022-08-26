@@ -26,20 +26,20 @@ const upload = multer({
   }),
 });
 
-// const uploadToS3 = multer({
-//   storage: multerS3({
-//     s3: s3,
-//     acl: "public-read",
-//     bucket: s3_bucket,
-//     key: function (req, file, cb) {
-//       if (file) {
-//         cb(null, generateUniqueFileName(file));
-//       }
-//     },
-//   }),
-// });
+const uploadToS3 = multer({
+  storage: multerS3({
+    s3: s3,
+    acl: "public-read",
+    bucket: s3_bucket,
+    key: function (req, file, cb) {
+      if (file) {
+        cb(null, generateUniqueFileName(file));
+      }
+    },
+  }),
+});
 
 export {
   upload,
-  // uploadToS3
+  uploadToS3
 };

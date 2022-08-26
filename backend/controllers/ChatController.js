@@ -103,12 +103,12 @@ const createGroupChat = asyncHandler(async (req, res) => {
       chatDisplayPic: process.env.DEFAULT_GROUP_DP,
     };
   } else {
-    // const uploadResponse = await cloudinary.uploader.upload(displayPic.path);
-    // displayPicData = {
-    //   cloudinary_id: uploadResponse.public_id,
-    //   chatDisplayPic: uploadResponse.secure_url,
-    // };
-    // deleteFile(displayPic.path);
+    const uploadResponse = await cloudinary.uploader.upload(displayPic.path);
+    displayPicData = {
+      cloudinary_id: uploadResponse.public_id,
+      chatDisplayPic: uploadResponse.secure_url,
+    };
+    deleteFile(displayPic.path);
   }
 
   const createdGroup = await ChatModel.create({
@@ -140,7 +140,7 @@ const deleteGroupDP = asyncHandler(async (req, res) => {
     throw new Error("Cannot Delete the Default Group DP");
   }
 
-  // const deletePromise = cloudinary.uploader.destroy(cloudinary_id);
+  const deletePromise = cloudinary.uploader.destroy(cloudinary_id);
   const updatePromise = ChatModel.findByIdAndUpdate(
     chatId,
     {
@@ -171,10 +171,10 @@ const updateGroupDP = asyncHandler(async (req, res) => {
     throw new Error("Invalid request params for update group dp");
   }
 
-  // const uploadPromise = cloudinary.uploader.upload(displayPic.path);
+  const uploadPromise = cloudinary.uploader.upload(displayPic.path);
   // Delete the existing dp only if it's not the default dp
   const destroyPromise = !currentDP.endsWith("group_mbuvht.png")
-    ? { /* cloudinary.uploader.destroy(cloudinary_id) */ }
+    ?  cloudinary.uploader.destroy(cloudinary_id) 
     : Promise.resolve();
 
   const [uploadResponse] = await Promise.all([uploadPromise, destroyPromise]);
@@ -289,7 +289,7 @@ const deleteGroupChat = asyncHandler(async (req, res) => {
   }
 
   const deleteDpPromise = !currentDP.endsWith("group_mbuvht.png")
-    ? { /*cloudinary.uploader.destroy(cloudinary_id) */ }
+    ? cloudinary.uploader.destroy(cloudinary_id) 
     : Promise.resolve();
   const deleteGroupPromise = ChatModel.findByIdAndDelete(chatId);
 

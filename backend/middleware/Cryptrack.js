@@ -1,12 +1,16 @@
 import fetch from 'node-fetch';
 import { APIKey, APISecret, username } from '../config/Cryptrack.js';
-export const addDigitalStamp = async (req, res, next) => {
+export const addDigitalStamp = async (req, res) => {
     try {
-        console.log('shubhank');
-        // const url = 'https://cryptrack-saewf.herokuapp.com/send';
-        const url = 'http://localhost:3001/send'
+        const url = 'https://cryptrack-saewf.herokuapp.com/send';
         let jsonBody = { ...req.body, msg: req.body.content, content: '' };
-        console.log('jaa raha hai : ', jsonBody);
+        for (let key in jsonBody) {
+            if (jsonBody.hasOwnProperty(key)) {
+                jsonBody[key] === '' || jsonBody[key] === undefined || jsonBody[key] === 'undefined' && delete jsonBody[key];
+            }
+        }
+        if (!jsonBody.hasOwnProperty('msg'))
+            jsonBody[msg] = '';
         const res = fetch(url, {
             method: 'POST',
             headers: {
@@ -17,9 +21,10 @@ export const addDigitalStamp = async (req, res, next) => {
             },
             body: JSON.stringify(jsonBody)
         });
-        console.log('res = ', res);
+        console.log(res);
         next();
     } catch (err) {
         console.log(err);
+        return res.status(403).json("Error while adding digital stamping!");
     }
 };
