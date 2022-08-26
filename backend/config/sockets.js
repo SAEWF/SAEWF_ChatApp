@@ -7,6 +7,7 @@ import {
 // Message event listeners
 const configureMsgEvents = (socket) => {
   socket.on("new msg sent", async (newMsg) => {
+    console.log(newMsg);
     const { chat } = newMsg;
     if (!chat) return;
 

@@ -239,29 +239,29 @@ const MessagesView = ({
     }
   };
 
-  // const downloadFile = async (fileId) => {
-  //   if (!fileId) return;
-  //   setDownloadingFileId(fileId);
-  //   setSending(true);
-  //   const config = getAxiosConfig({ loggedInUser, blob: true });
-  //   try {
-  //     const { data } = await axios.get(`/api/message/files/${fileId}`, config);
+  const downloadFile = async (fileId) => {
+    if (!fileId) return;
+    setDownloadingFileId(fileId);
+    setSending(true);
+    const config = getAxiosConfig({ loggedInUser, blob: true });
+    try {
+      const { data } = await axios.get(`/api/message/files/${fileId}`, config);
 
-  //     const link = document.createElement("a");
-  //     link.href = URL.createObjectURL(new Blob([data]));
-  //     link.setAttribute("download", fileId.split("---")[1] || fileId);
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     link.remove();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([data]));
+      link.setAttribute("download", fileId.split("---")[1] || fileId);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
 
-  //     setDownloadingFileId("");
-  //     setSending(false);
-  //   } catch (error) {
-  //     displayError(error, "Couldn't Download File");
-  //     setDownloadingFileId("");
-  //     setSending(false);
-  //   }
-  // };
+      setDownloadingFileId("");
+      setSending(false);
+    } catch (error) {
+      displayError(error, "Couldn't Download File");
+      setDownloadingFileId("");
+      setSending(false);
+    }
+  };
 
   const fetchMessages = async (options) => {
     setLoadingMsgs(true);
@@ -336,16 +336,18 @@ const MessagesView = ({
     
     try {
       // Upload img/gif to cloudinary, and all other files to aws s3
-      // const apiUrl = isNonImageFile
-      //   ? `/api/message/upload-to-s3`
-      //   : `/api/message/`;
+      const apiUrl =
+        isNonImageFile
+        ? `/api/message/upload-to-s3`
+          :
+          `/api/message/`;
       let chats = await axios.get('/api/chat', config);
       chats = chats.data;
       console.log(chats);
       let users = chats.filter((c) => c._id === selectedChat?._id)[0]?.users;
       let receiver = users.filter((u) => u._id !== loggedInUser?._id)[0];
       console.log(receiver);
-      const apiUrl = `/api/message/`;
+      // const apiUrl = `/api/message/`;
 
       const formData = new FormData();
       formData.append("attachment", msgData.attachment);
@@ -457,9 +459,11 @@ const MessagesView = ({
 
     try {
       // Upload img/gif to cloudinary, and all other files to aws s3
-      const apiUrl = isNonImageFile
+      const apiUrl =
+        isNonImageFile
         ? `/api/message/update-in-s3`
-        : `/api/message/update`;
+          :
+          `/api/message/update`;
 
       const formData = new FormData();
       formData.append("attachment", msgData.attachment);
@@ -714,66 +718,66 @@ const MessagesView = ({
   };
 
   // Msgs click handler ('Event Delegation' applied here)
-  // const msgsClickHandler = (e) => {
-  //   console.log("messageClicked", clickedMsgId);
-  //   const { dataset } = e.target;
-  //   const parentDataset = e.target.parentNode.dataset;
-  //   const senderData = (dataset.sender || parentDataset.sender)?.split("===");
-  //   const msgId = dataset.msg || parentDataset.msg;
-  //   const videoId = dataset.video || parentDataset.video;
-  //   const audioId = dataset.audio || parentDataset.audio;
-  //   const fileId = dataset.download || parentDataset.download;
-  //   const updateEditedMsg = dataset.updateMsg || parentDataset.updateMsg;
-  //   const attachMsgFileClicked =
-  //     dataset.attachMsgFile || parentDataset.attachMsgFile;
-  //   const removeMsgFileClicked =
-  //     dataset.removeMsgFile || parentDataset.removeMsgFile;
-  //   const editMsgFileClicked = dataset.editMsgFile || parentDataset.editMsgFile;
-  //   const discardDraftClicked =
-  //     dataset.discardDraft || parentDataset.discardDraft;
-  //   hideEmojiPicker();
-  //     if (fileId) {
-  //       downloadFile(fileId);
-  //     } else if (videoId) {
-  //       // Load video
-  //       loadMedia(videoId, {
-  //         fileName: dataset.videoName || parentDataset.videoName,
-  //         isAudio: false,
-  //       });
-  //     } else if (audioId) {
-  //       // Load audio
-  //       loadMedia(audioId, {
-  //         fileName: dataset.audioName || parentDataset.audioName,
-  //         isAudio: true,
-  //       });
-  //     } else if (dataset.imageId) {
-  //       displayFullSizeImage(e);
-  //     } else if (senderData?.length) {
-  //       // Open view profile dialog
-  //     const props = {
-  //       memberProfilePic: senderData[0],
-  //       memberName: senderData[1],
-  //       memberEmail: senderData[2],
-  //     };
-  //     openViewProfileDialog(props);
-  //     } else if (msgId && !msgEditMode) {
-  //     msgFileAlreadyExists = Boolean(
-  //       dataset.fileExists || parentDataset.fileExists
-  //     );
-  //     setClickedMsgId(msgId);
-  //     openMsgOptionsMenu(e);
-  //   } else if (attachMsgFileClicked || editMsgFileClicked) {
-  //     selectAttachment();
-  //   } else if (removeMsgFileClicked) {
-  //     setMsgFileRemoved(true);
-  //     discardAttachment();
-  //   } else if (discardDraftClicked) {
-  //     openDiscardDraftConfirmDialog();
-  //   } else if (updateEditedMsg) {
-  //     const msgDate = dataset.msgCreatedAt || parentDataset.msgCreatedAt;
-  //     updateMessage(editableMsgContent?.current?.innerHTML, msgDate);
-  //   }
-  // };
+  const msgsClickHandler = (e) => {
+    console.log("messageClicked", clickedMsgId);
+    const { dataset } = e.target;
+    const parentDataset = e.target.parentNode.dataset;
+    const senderData = (dataset.sender || parentDataset.sender)?.split("===");
+    const msgId = dataset.msg || parentDataset.msg;
+    const videoId = dataset.video || parentDataset.video;
+    const audioId = dataset.audio || parentDataset.audio;
+    const fileId = dataset.download || parentDataset.download;
+    const updateEditedMsg = dataset.updateMsg || parentDataset.updateMsg;
+    const attachMsgFileClicked =
+      dataset.attachMsgFile || parentDataset.attachMsgFile;
+    const removeMsgFileClicked =
+      dataset.removeMsgFile || parentDataset.removeMsgFile;
+    const editMsgFileClicked = dataset.editMsgFile || parentDataset.editMsgFile;
+    const discardDraftClicked =
+      dataset.discardDraft || parentDataset.discardDraft;
+    hideEmojiPicker();
+      if (fileId) {
+        downloadFile(fileId);
+      } else if (videoId) {
+        // Load video
+        loadMedia(videoId, {
+          fileName: dataset.videoName || parentDataset.videoName,
+          isAudio: false,
+        });
+      } else if (audioId) {
+        // Load audio
+        loadMedia(audioId, {
+          fileName: dataset.audioName || parentDataset.audioName,
+          isAudio: true,
+        });
+      } else if (dataset.imageId) {
+        displayFullSizeImage(e);
+      } else if (senderData?.length) {
+        // Open view profile dialog
+      const props = {
+        memberProfilePic: senderData[0],
+        memberName: senderData[1],
+        memberEmail: senderData[2],
+      };
+      openViewProfileDialog(props);
+      } else if (msgId && !msgEditMode) {
+      msgFileAlreadyExists = Boolean(
+        dataset.fileExists || parentDataset.fileExists
+      );
+      setClickedMsgId(msgId);
+      openMsgOptionsMenu(e);
+    } else if (attachMsgFileClicked || editMsgFileClicked) {
+      selectAttachment();
+    } else if (removeMsgFileClicked) {
+      setMsgFileRemoved(true);
+      discardAttachment();
+    } else if (discardDraftClicked) {
+      openDiscardDraftConfirmDialog();
+    } else if (updateEditedMsg) {
+      const msgDate = dataset.msgCreatedAt || parentDataset.msgCreatedAt;
+      updateMessage(editableMsgContent?.current?.innerHTML, msgDate);
+    }
+  };
 
   useEffect(() => {
     if (!dontScrollToBottom) scrollToBottom();
@@ -823,9 +827,7 @@ const MessagesView = ({
   }
 
   const forwardMessage = async (prevMsg, usr) => {
-  
     let config = getAxiosConfig({ loggedInUser });
-    console.log(usr);
     const { data } = await axios.post(
       `/api/chat`,
       { userId: usr?._id },
@@ -834,26 +836,33 @@ const MessagesView = ({
     const chat = data;
     const chatId = chat?._id;
     
-    console.log("chat", chat);
-    
     const msgData = {
-      ...attachmentData,
+      attachment: {
+        fileUrl: prevMsg.fileUrl,
+        file_id: prevMsg.file_id,
+        file_name: prevMsg.file_name
+      },
       content: prevMsg?.content || "",
     };
-
-    console.log('msgData', msgData);
-
+    
     config = getAxiosConfig({ loggedInUser, formData: true });
-
+    
     try {
       // Upload img/gif to cloudinary, and all other files to aws s3
-      // const apiUrl = isNonImageFile
-      //   ? `/api/message/upload-to-s3`
-      //   : `/api/message/`;
-
-      const apiUrl = `/api/message/`;
+      let filename = msgData.attachment?.fileUrl?.split('.');
+      console.log(filename);
+      if (filename) filename = filename[filename?.length - 1];
+      console.log(prevMsg);
+      const isNonImageFile = !isImageOrGifFile(filename);
+      const apiUrl =
+        isNonImageFile
+          ? `/api/message/upload-to-s3`
+          :
+          `/api/message/`;
+          console.log(apiUrl);
+      // const apiUrl = `/api/message/`;
       const formData = new FormData();
-      formData.append("attachment", msgData.attachment);
+      formData.append("attachmentData", JSON.stringify(msgData.attachment));
       formData.append("mediaDuration", msgData?.mediaDuration);
       formData.append("content", msgData.content);
       formData.append("chatId", chatId);
@@ -863,9 +872,12 @@ const MessagesView = ({
       formData.append("time", new Date().getTime());
       formData.append("prev_time", prevMsg?.time);
       formData.append("forwarded", true);
-
+      formData.append("isFile", attachmentData?.fileUrl);
+      
+      console.log('msgData', msgData);
       const { data } = await axios.post(apiUrl, formData, config);
-      console.log(data);
+      console.log('askfhadgadsdju jgdejknea');
+      console.log('res', data);
       return data;
     } catch (error) {
       displayError(error, "Couldn't Send Message");
@@ -880,25 +892,28 @@ const MessagesView = ({
       hideEmojiPicker();
       const prevMsg = messages.filter(msg => msg._id === clickedMsgId)[0];
       if (!prevMsg) return;
-    
+
       setDontScrollToBottom(false);
       resetMsgInput();
       setSending(true);
       dispatch(setLoading(true));
-
+      
       let data = forwardUsers.map(async (usr) => {
         return await forwardMessage(prevMsg, usr);
-      })
+      });
       data = await Promise.all(data);
       console.log(data);
       
-      displaySuccess("Message Forwarded Successfully");
       if (isSocketConnected)
-        data.forEach(d => clientSocket?.emit("new msg sent", d));
+        data.forEach(d => {
+          console.log(d);
+          d && clientSocket?.emit("new msg sent", d);
+        });
       fetchMessages();
       dispatch(toggleRefresh(!refresh));
       dispatch(setLoading(false));
       setSending(false);
+      displaySuccess("Message Forwarded Successfully");
       return "msgActionDone";
     } catch (error) {
       displayError(error, "Couldn't Send Message");
@@ -961,7 +976,7 @@ const MessagesView = ({
             <div className="messages rounded-3 d-flex flex-column">
               <div
                 // Event delegation
-                // onClick={msgsClickHandler}
+                onClick={msgsClickHandler}
                 onKeyDown={msgKeydownHandler}
                 className={`msgArea overflow-auto ${
                   fileAttached && !msgEditMode ? "d-none" : "d-flex"
@@ -1023,7 +1038,7 @@ const MessagesView = ({
                 msgEditMode || sending ? "pe-none" : "pe-auto"
               }`}
             >
-              {/* <span
+              <span
                 className={`d-flex attachFile ${disableIfLoading} pointer bg-dark`}
               >
                 <IconButton
@@ -1041,7 +1056,7 @@ const MessagesView = ({
                   >
                     <AttachFile style={{ fontSize: 22 }} />
                   </IconButton>
-                </CustomTooltip> */}
+                </CustomTooltip>
                 {/* Emoji Picker */}
                 {/* {showEmojiPicker && (
                   <span className="emojiPicker position-absolute start-0">
@@ -1064,7 +1079,7 @@ const MessagesView = ({
                   className={`d-none`}
                   disabled={loadingMsgs}
                 />
-              {/* </span> */}
+              </span>
               {/* Content/text input */}
               <div
                 onFocus={onInputFocus}
