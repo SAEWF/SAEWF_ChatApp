@@ -35,7 +35,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   console.log(attachment, content, chatId);
   // console.log(req.body);
 
-  if ((!content && !isFile && !attachment) || !chatId) {
+  if ((!content && !attachment) || !chatId) {
     res.status(400);
     throw new Error("Invalid request params for sending a message");
   }
