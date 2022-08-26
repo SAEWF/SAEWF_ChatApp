@@ -336,9 +336,11 @@ const MessagesView = ({
     
     try {
       // Upload img/gif to cloudinary, and all other files to aws s3
-      const apiUrl = isNonImageFile
+      const apiUrl =
+        isNonImageFile
         ? `/api/message/upload-to-s3`
-        : `/api/message/`;
+          :
+          `/api/message/`;
       let chats = await axios.get('/api/chat', config);
       chats = chats.data;
       console.log(chats);
@@ -457,9 +459,11 @@ const MessagesView = ({
 
     try {
       // Upload img/gif to cloudinary, and all other files to aws s3
-      const apiUrl = isNonImageFile
+      const apiUrl =
+        isNonImageFile
         ? `/api/message/update-in-s3`
-        : `/api/message/update`;
+          :
+          `/api/message/update`;
 
       const formData = new FormData();
       formData.append("attachment", msgData.attachment);
@@ -822,10 +826,8 @@ const MessagesView = ({
     openMsgOptionsMenu(e);
   }
 
-  const forwardMessage = async (prevMsg, usr, attachedFile) => {
-    console.log('attachedFile', attachedFile);
+  const forwardMessage = async (prevMsg, usr) => {
     let config = getAxiosConfig({ loggedInUser });
-    console.log(usr);
     const { data } = await axios.post(
       `/api/chat`,
       { userId: usr?._id },
@@ -834,27 +836,33 @@ const MessagesView = ({
     const chat = data;
     const chatId = chat?._id;
     
-    console.log("chat", chat);
-    
     const msgData = {
-      attachment: attachedFile,
+      attachment: {
+        fileUrl: prevMsg.fileUrl,
+        file_id: prevMsg.file_id,
+        file_name: prevMsg.file_name
+      },
       content: prevMsg?.content || "",
     };
-
-    console.log('msgData', msgData);
-
+    
     config = getAxiosConfig({ loggedInUser, formData: true });
-
+    
     try {
       // Upload img/gif to cloudinary, and all other files to aws s3
-      const isNonImageFile = !isImageOrGifFile(msgData.attachment?.name);
-      const apiUrl = isNonImageFile
-        ? `/api/message/upload-to-s3`
-        : `/api/message/`;
-      console.log(apiUrl);
+      let filename = msgData.attachment?.fileUrl?.split('.');
+      console.log(filename);
+      if (filename) filename = filename[filename?.length - 1];
+      console.log(prevMsg);
+      const isNonImageFile = !isImageOrGifFile(filename);
+      const apiUrl =
+        isNonImageFile
+          ? `/api/message/upload-to-s3`
+          :
+          `/api/message/`;
+          console.log(apiUrl);
       // const apiUrl = `/api/message/`;
       const formData = new FormData();
-      formData.append("attachment", msgData.attachment);
+      formData.append("attachmentData", JSON.stringify(msgData.attachment));
       formData.append("mediaDuration", msgData?.mediaDuration);
       formData.append("content", msgData.content);
       formData.append("chatId", chatId);
@@ -864,23 +872,18 @@ const MessagesView = ({
       formData.append("time", new Date().getTime());
       formData.append("prev_time", prevMsg?.time);
       formData.append("forwarded", true);
-      console.log(formData['attachment']);
+      formData.append("isFile", attachmentData?.fileUrl);
+      
+      console.log('msgData', msgData);
       const { data } = await axios.post(apiUrl, formData, config);
-      console.log('res',data);
+      console.log('askfhadgadsdju jgdejknea');
+      console.log('res', data);
       return data;
     } catch (error) {
       displayError(error, "Couldn't Send Message");
       setSending(false);
     }
   }
-
-  const getBase64 = (blob) => {
-    return new Promise((resolve, _) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    });
-  };
 
   const handleForward = async () => {
     try {
@@ -889,39 +892,28 @@ const MessagesView = ({
       hideEmojiPicker();
       const prevMsg = messages.filter(msg => msg._id === clickedMsgId)[0];
       if (!prevMsg) return;
-    
+
       setDontScrollToBottom(false);
       resetMsgInput();
       setSending(true);
       dispatch(setLoading(true));
       
-      let attachedFile;
-      if (prevMsg.fileUrl) {
-        let fileurl = prevMsg.fileUrl;
-        attachedFile = await fetch(fileurl).then(d=>d.blob());
-      }
-      // console.log('attachedFile', attachedFile);
-      console.log('prev', prevMsg);
-
       let data = forwardUsers.map(async (usr) => {
-        const img = await getBase64(attachedFile)
-        return await forwardMessage(prevMsg, usr, img);
-        // return res;
-        // });
+        return await forwardMessage(prevMsg, usr);
       });
       data = await Promise.all(data);
       console.log(data);
       
-      displaySuccess("Message Forwarded Successfully");
       if (isSocketConnected)
         data.forEach(d => {
           console.log(d);
-          clientSocket?.emit("new msg sent", d);
+          d && clientSocket?.emit("new msg sent", d);
         });
       fetchMessages();
       dispatch(toggleRefresh(!refresh));
       dispatch(setLoading(false));
       setSending(false);
+      displaySuccess("Message Forwarded Successfully");
       return "msgActionDone";
     } catch (error) {
       displayError(error, "Couldn't Send Message");

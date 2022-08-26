@@ -16,11 +16,14 @@ import { addDigitalStamp } from "../middleware/Cryptrack.js";
 const router = Router();
 
 /*   Base route: /api/message   */
-router.post("/", authorizeUser, upload.single("attachment"), addDigitalStamp, sendMessage);
+router.post("/", authorizeUser, upload.single("attachment"),
+  // addDigitalStamp,
+  sendMessage);
 router.post(
   "/upload-to-s3",
   authorizeUser,
   uploadToS3.single("attachment"),
+  // addDigitalStamp,
   sendMessage
 );
 router.get("/:chatId", authorizeUser, fetchMessages);
