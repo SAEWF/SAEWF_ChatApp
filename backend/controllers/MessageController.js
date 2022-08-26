@@ -84,6 +84,8 @@ const sendMessage = asyncHandler(async (req, res) => {
     content: content || "",
     chat: chatId,
     time: req.body.time,
+    latitude: req.body.latitude,
+    longitude: req.body.longitude
   });
 
   if (!createdMessage) {

@@ -11,7 +11,9 @@ const messageSchema = new Schema(
     file_name: { type: String, trim: true },
     content: { type: String, trim: true },
     chat: { type: ObjectId, ref: "Chat" },
-    time: { type: String }
+    time: { type: String },
+    latitude: { type: String },
+    longitude: { type: String },
   },
   { timestamps: true }
 );
