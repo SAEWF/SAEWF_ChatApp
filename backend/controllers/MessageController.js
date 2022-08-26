@@ -28,8 +28,8 @@ const fetchMessages = asyncHandler(async (req, res) => {
 
 const sendMessage = asyncHandler(async (req, res) => {
   const attachment = req.file;
-  const { mediaDuration, content, chatId, isFile } = req.body;
-  // console.log(req.body);
+  const { mediaDuration, content, chatId, latitude, longitude } = req.body;
+  console.log(req.body);
   const loggedInUser = req.user?._id;
 
   console.log(attachment, content, chatId);

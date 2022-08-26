@@ -361,7 +361,7 @@ const MessagesView = ({
       // console.log('selected Chat', selectedChat);
       // console.log(formData);
       const { data } = await axios.post(apiUrl, formData, config);
-      console.log('res', data);
+      console.log(data);
       if (isSocketConnected) clientSocket?.emit("new msg sent", data);
       fetchMessages();
       dispatch(toggleRefresh(!refresh));
@@ -871,8 +871,7 @@ const MessagesView = ({
       formData.append("time", new Date().getTime());
       formData.append("prev_time", prevMsg?.time);
       formData.append("forwarded", true);
-      formData.append("isFile", attachmentData?.fileUrl);
-      
+
       const { data } = await axios.post(apiUrl, formData, config);
       console.log('res', data);
       return data;
