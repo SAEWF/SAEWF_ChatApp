@@ -79,6 +79,19 @@ const MessagesView = ({
   isNewUser,
   typingChatUser,
 }) => {
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      console.log("Available");
+    } else {
+      console.log("Not Available");
+    }
+    navigator.geolocation.getCurrentPosition(function(position) {
+      setCoord1(position.coords.latitude);
+      setCoord2(position.coords.longitude);
+      console.log("Latitude is :", position.coords.latitude);
+      console.log("Longitude is :", position.coords.longitude);
+    });
+  }, []);
   const {
     loggedInUser,
     selectedChat,
@@ -108,8 +121,10 @@ const MessagesView = ({
   const [downloadingFileId, setDownloadingFileId] = useState("");
   const [loadingMediaId, setLoadingMediaId] = useState("");
   const [msgEditMode, setMsgEditMode] = useState(false);
+  const [coords1, setCoord1] = useState(0);
+  const [coords2, setCoord2] = useState(0);
   const [msgOptionsMenuAnchor, setMsgOptionsMenuAnchor] = useState(null);
-
+  
   let forwardUsers = [];
   const getAddedMembers = (updatedMembers) => {
     forwardUsers = updatedMembers;
@@ -303,6 +318,7 @@ const MessagesView = ({
 
     console.log('msgData', msgData);
 
+
     const isNonImageFile = !isImageOrGifFile(msgData.attachment?.name);
 
     const newMsg = {
@@ -355,11 +371,13 @@ const MessagesView = ({
       formData.append("sender", loggedInUser?.email);
       formData.append("receiver", receiver?.email);
       formData.append("time", new Date().getTime());
+      formData.append("latitude", coords1);
+      formData.append("longitude", coords2);
       // console.log(formData.get('content'));
       // console.log('selected Chat', selectedChat);
-      // console.log(formData);
+      // console.log(formData.get('location'));
       const { data } = await axios.post(apiUrl, formData, config);
-
+      console.log(data);
       if (isSocketConnected) clientSocket?.emit("new msg sent", data);
       fetchMessages();
       dispatch(toggleRefresh(!refresh));
@@ -863,6 +881,10 @@ const MessagesView = ({
       formData.append("time", new Date().getTime());
       formData.append("prev_time", prevMsg?.time);
       formData.append("forwarded", true);
+      formData.append("latitude", coords1);
+      formData.append("longitude", coords2);
+      formData.append("prev_latitude", prevMsg?.latitude);
+      formData.append("prev_longitude", prevMsg?.longitude)
 
       const { data } = await axios.post(apiUrl, formData, config);
       console.log(data);

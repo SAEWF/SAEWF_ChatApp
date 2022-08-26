@@ -27,7 +27,7 @@ const fetchMessages = asyncHandler(async (req, res) => {
 
 const sendMessage = asyncHandler(async (req, res) => {
   const attachment = req.file;
-  const { mediaDuration, content, chatId } = req.body;
+  const { mediaDuration, content, chatId, latitude, longitude } = req.body;
   console.log(req.body);
   const loggedInUser = req.user?._id;
 
@@ -72,6 +72,8 @@ const sendMessage = asyncHandler(async (req, res) => {
   const createdMessage = await MessageModel.create({
     sender: loggedInUser,
     ...attachmentData,
+    latitude : latitude,
+    longitude : longitude,
     content: content || "",
     chat: chatId,
     time: req.body.time,
