@@ -361,7 +361,7 @@ const MessagesView = ({
       // console.log('selected Chat', selectedChat);
       // console.log(formData);
       const { data } = await axios.post(apiUrl, formData, config);
-
+      console.log('res', data);
       if (isSocketConnected) clientSocket?.emit("new msg sent", data);
       fetchMessages();
       dispatch(toggleRefresh(!refresh));
@@ -852,7 +852,6 @@ const MessagesView = ({
       let filename = msgData.attachment?.fileUrl?.split('.');
       console.log(filename);
       if (filename) filename = filename[filename?.length - 1];
-      console.log(prevMsg);
       const isNonImageFile = !isImageOrGifFile(filename);
       const apiUrl =
         isNonImageFile
@@ -874,9 +873,7 @@ const MessagesView = ({
       formData.append("forwarded", true);
       formData.append("isFile", attachmentData?.fileUrl);
       
-      console.log('msgData', msgData);
       const { data } = await axios.post(apiUrl, formData, config);
-      console.log('askfhadgadsdju jgdejknea');
       console.log('res', data);
       return data;
     } catch (error) {
@@ -906,7 +903,6 @@ const MessagesView = ({
       
       if (isSocketConnected)
         data.forEach(d => {
-          console.log(d);
           d && clientSocket?.emit("new msg sent", d);
         });
       fetchMessages();
